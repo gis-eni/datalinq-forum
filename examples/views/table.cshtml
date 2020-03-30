@@ -1,0 +1,36 @@
+<style>
+    table {
+      border-collapse: collapse;
+      width:100%;
+      max-width:800px;
+    }
+    
+    table, th, td {
+      border: 1px solid #eee;
+    }
+    td, th{
+        padding:2px;
+        text-align: right;
+    }
+    th {
+        background-color:#ccc;
+    }
+</style>
+
+<table>
+    <tr>
+        <th>Bezirk</th>
+        <th>Männer</th>
+        <th>Frauen</th>
+    </tr>
+  @foreach(var record in Model.Records) {
+
+    <tr>
+        <td>@record["BEZIRK"]</td>
+        <td>@record["MAENNER"]</td>
+        <td>@record["FRAUEN"]</td>
+    </tr>
+
+  }
+
+</table>
