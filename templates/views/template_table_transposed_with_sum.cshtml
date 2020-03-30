@@ -1,0 +1,168 @@
+@* C# Code Abschnitt, um ein paar Variablen zu defeineiren *@
+@{
+    // In tableRows kann definert werden, welche Spalten aus den Records angezeigt werden solten
+    // name = Name der Spalte in der Abfrage/Datenbank
+    // alias = Spaltenüberschrigt 
+    // Sum = über dieses Feld solte summiert werden
+
+    var tableRows = new dynamic[] {
+        new { name = "FRAUEN",  alias = "Frauen:", sum = true },
+        new { name = "MAENNER", alias = "Männer:", sum = true }
+        
+    };
+    
+    // gibt an, ob über Zeilen und/oder Spalten summiert werden sollte
+    var sumRows = false;
+    var sumColumns = true;
+
+
+    // Das Feld für die Spalten meiner Tabelle (zB. BEZIRK)
+    var columnField = "BEZIRK"; 
+     
+    // Variante 1: Wie die Bezirk daher kommen
+    //var tableColumns = Model.Records.Select(r => r[columnField]?.ToString());   
+    
+    
+    // Variante 2: Alphabetisch
+    // var tableColumns = Model.Records.Select(r => r[columnField]?.ToString()).OrderBy(name => name);
+
+
+    // Variante 3: Nach Anzahle der Männer+Frauen
+    // var tableColumns = Model.Records
+    //        .OrderByDescending(r => Convert.ToInt32(r["MAENNER"]) + Convert.ToInt32(r["FRAUEN"]))
+    //        .Select(r => r[columnField].ToString());
+    
+    // Variante 4: Namen angeben
+    // Achtung hier muss man alle angeben, weil sonst unten die Summen nicht stimmen 
+    //         => Summiert wird in der rechten Spalte über alle Ergebnisse, 
+    //         die Abgefragt werden, nicht über die Spalten die angezeigt werden!!!
+    //        Sollte man also nur verwenden, wenn man wirklich alle Splaten angibt oder du Summierung unter anders gestalet
+    var tableColumns = new string[]{ "Graz (Stadt)","Bruck an der Mur" };
+}
+
+@* Styles für die Tablelle können beliegib angpasst oder global definiert werden *@
+<style>
+    table {
+      border-collapse: collapse;
+      width:100%;
+      max-width:800px;
+    }
+    
+    table, th, td {
+      border: 1px solid #eee;
+    }
+    td, th{
+        padding:2px;
+        text-align: right;
+    }
+    th {
+        background-color:#ccc;
+    }
+    td:first-child {
+        background-color:#efefef;
+    }
+</style>
+
+@*
+    HTML/Razor Abschnitt für eie eigentliche Tabelle. Wenn oben tableColumns und tableRows definert wurden
+    Kann dieser Abschnitt für alle möglichen Daten übernommen werden.
+    Angepasst muss nur die Switch Anweisung für die erste Spatle werden!!
+*@
+<table>
+    <tr>
+        <th></th>
+        @foreach(var tableColumn in tableColumns)
+        {
+            <th>
+                @tableColumn
+            </th>
+        }
+        
+        @if(sumColumns == true) {
+            <th>Summe</th>
+        }
+    </tr>
+    
+    @foreach(var tableRow in tableRows) 
+    {
+        <tr>
+        
+            <td>@tableRow.alias</td>
+            
+            @{ var summe = 0; }
+            
+            @*
+              Jetzt die Werte der einzelen Spalten (zB Bezirke) wie in tableColumns definiert ausgeben.
+              Dazu wird aus dern Records zu erste der entsprechende Record mit .Where( record => ....) gesucht
+              .FirstOrDefault() gibt den ersten Wert der gefunden wird aus oder NULL, wenn nix gefunden wird (sollte in diesen Bespeil nicht vorkommen
+            *@
+            
+            @foreach(var tableColumn in tableColumns) 
+            {
+                @{
+                    var record = Model.Records.Where(r => tableColumn.Equals(r[columnField])).FirstOrDefault();
+                }
+               
+                @if(record == null) { @* sollte eigentlich nicht passieren!! => leere spalte *@
+                    <td></td>
+                } else {
+                    <td>@record[tableRow.name]</td>
+                    
+                    @if(tableRow.sum == true) {
+                        summe += Convert.ToInt32(record[tableRow.name]);
+                    }
+                }
+            }
+            
+            @*
+                In der letzen Spalte wird über die Werte der aktuen Zeile (tableRow) summiert
+            *@
+            
+            @if(sumColumns) {
+                <td>
+                    <strong>
+                        @summe
+                    </strong>
+                </td>
+            }
+        </tr>
+    }
+    
+    @*
+        In der letzen Zeile wird noch einmal über alles Summeirt
+    *@
+        
+    @if(sumRows) {    
+        <tr style="border-top: 2px solid #000">
+            <td><strong>Summe:</strong></td>
+            
+            @{var gesSumme = 0; }
+            
+            @foreach(var tableColumn in tableColumns) 
+            {
+                @{
+                    var record = Model.Records.Where(r => tableColumn.Equals(r[columnField])).FirstOrDefault();
+                }
+               
+                @if(record == null) { @* sollte eigentlich nicht passieren!! => leere spalte *@
+                    <td></td>
+                } else {
+                    var sum = 0;
+                    foreach(var tableRow in tableRows) {
+                        sum += Convert.ToInt32(record[tableRow.name]);
+                        gesSumme += Convert.ToInt32(record[tableRow.name]);
+                    }
+                    <td><strong>@sum</strong></td>
+                }
+            }
+            
+            @if(sumColumns) {
+            <td>
+                <strong>
+                    @gesSumme
+                </strong>
+            </td>
+            }
+        </tr>
+    }
+</table>

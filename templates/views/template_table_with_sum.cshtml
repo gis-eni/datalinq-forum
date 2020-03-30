@@ -1,0 +1,112 @@
+@* Variablen definieren *@
+@{
+ 
+    // In tableColumns kann definert werden, welche Spalten aus den Records angezeigt werden solten
+    // name = Name der Spalte in der Abfrage/Datenbank
+    // alias = Spaltenüberschrigt 
+    // Sum = über dieses Feld solte summiert werden
+
+    var tableColumns = new dynamic[] {
+    
+        new { name = "BEZIRK",  alias = "Bezirk", sum = false },
+        new { name = "FRAUEN",  alias = "Frauen", sum = true },
+        new { name = "MAENNER", alias = "Männer", sum = true }
+        
+    };
+    
+    // gibt an, ob über Zeilen und/oder Spalten summiert werden sollte
+    var sumRows = true;
+    var sumColumns = true;
+    
+}
+
+@* Styles, nach belieben anpassen *@
+
+<style>
+    table {
+      border-collapse: collapse;
+      width:100%;
+      max-width:800px;
+    }
+    
+    table, th, td {
+      border: 1px solid #eee;
+    }
+    td, th{
+        padding:2px;
+        text-align: right;
+    }
+    th {
+        background-color:#ccc;
+    }
+    td:first-child {
+        background-color:#efefef;
+    }
+</style>
+
+@* Ab hier sollte alles automatisch aus der oben defineriten tableColumns Variablen kommen *@ 
+
+<table>
+    <tr>
+        @foreach(var tableColumn in tableColumns) {
+            <th>
+                <strong>@tableColumn.alias</strong>
+            </th>
+        }
+        @if(sumColumns == true) 
+        {
+            <th>Summe</hd>
+        }
+    </tr>
+    
+  @{ var gesamtSumme = 0; }
+  @foreach(var record in Model.Records)
+  {
+    <tr>
+        @{ var summe = 0; }
+        
+        @foreach(var tableColumn in tableColumns) {
+            <td>@record[tableColumn.name]</td>
+            
+            @if(tableColumn.sum == true) 
+            {
+                summe += Convert.ToInt32(record[tableColumn.name]);
+                gesamtSumme += Convert.ToInt32(record[tableColumn.name]);
+            }
+        }
+        @if(sumColumns == true) 
+        {
+            <td><strong>@summe</strong></td>
+        }
+    </tr>
+
+  }
+
+  @if(sumRows == true) 
+  {
+    <tr style='border-top: 2px solid #000'>
+        @foreach(var tableColumn in tableColumns) {
+            if(tableColumn.sum == true) 
+            {
+                <td>
+                    <strong>
+                        @Model.Records.Sum(r => Convert.ToInt32(r[tableColumn.name]))
+                    </strong>
+                </td>
+            } 
+            else 
+            {
+                <td></td>
+            }
+        }
+        @if(sumColumns == true)
+        {
+            <td>
+                <strong>
+                    @gesamtSumme
+                </strong>
+            </td>
+        }
+    </tr>
+    }
+</table>
