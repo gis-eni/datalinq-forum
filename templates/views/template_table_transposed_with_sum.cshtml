@@ -12,7 +12,7 @@
     };
     
     // gibt an, ob über Zeilen und/oder Spalten summiert werden sollte
-    var sumRows = false;
+    var sumRows = true;
     var sumColumns = true;
 
 
@@ -20,7 +20,7 @@
     var columnField = "BEZIRK"; 
      
     // Variante 1: Wie die Bezirk daher kommen
-    //var tableColumns = Model.Records.Select(r => r[columnField]?.ToString());   
+    var tableColumns = Model.Records.Select(r => r[columnField]?.ToString());   
     
     
     // Variante 2: Alphabetisch
@@ -33,11 +33,7 @@
     //        .Select(r => r[columnField].ToString());
     
     // Variante 4: Namen angeben
-    // Achtung hier muss man alle angeben, weil sonst unten die Summen nicht stimmen 
-    //         => Summiert wird in der rechten Spalte über alle Ergebnisse, 
-    //         die Abgefragt werden, nicht über die Spalten die angezeigt werden!!!
-    //        Sollte man also nur verwenden, wenn man wirklich alle Splaten angibt oder du Summierung unter anders gestalet
-    var tableColumns = new string[]{ "Graz (Stadt)","Bruck an der Mur" };
+    // var tableColumns = new string[]{ "Graz (Stadt)", "Bruck an der Mur" };
 }
 
 @* Styles für die Tablelle können beliegib angpasst oder global definiert werden *@
