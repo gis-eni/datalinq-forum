@@ -6,6 +6,7 @@
     // Sum = über dieses Feld solte summiert werden
 
     var tableRows = new dynamic[] {
+        new { name = "LAND",    alias = "Bundesland:", sum = false },
         new { name = "FRAUEN",  alias = "Frauen:", sum = true },
         new { name = "MAENNER", alias = "Männer:", sum = true }
         
@@ -33,7 +34,7 @@
     //        .Select(r => r[columnField].ToString());
     
     // Variante 4: Namen angeben
-    // var tableColumns = new string[]{ "Graz (Stadt)", "Bruck an der Mur" };
+    // var tableColumns = new string[]{ "Graz (Stadt)", "Linz (Stadt)", "Salzburg (Stadt)" };
 }
 
 @* Styles für die Tablelle können beliegib angpasst oder global definiert werden *@
@@ -116,9 +117,11 @@
             
             @if(sumColumns) {
                 <td>
-                    <strong>
-                        @summe
-                    </strong>
+                    @if(tableRow.sum == true) {
+                        <strong>
+                            @summe
+                        </strong>
+                    }
                 </td>
             }
         </tr>
@@ -145,8 +148,10 @@
                 } else {
                     var sum = 0;
                     foreach(var tableRow in tableRows) {
-                        sum += Convert.ToInt32(record[tableRow.name]);
-                        gesSumme += Convert.ToInt32(record[tableRow.name]);
+                        if(tableRow.sum == true) {
+                            sum += Convert.ToInt32(record[tableRow.name]);
+                            gesSumme += Convert.ToInt32(record[tableRow.name]);
+                        }
                     }
                     <td><strong>@sum</strong></td>
                 }
