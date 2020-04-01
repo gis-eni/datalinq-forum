@@ -1,0 +1,72 @@
+@* Variablen definieren *@
+@{
+ 
+    // In tableColumns kann definert werden, welche Spalten aus den Records angezeigt werden solten
+    // name = Name der Spalte in der Abfrage/Datenbank
+    // alias = Spaltenüberschrigt 
+
+    var tableColumns = new dynamic[] {
+    
+        new { name = "BEZNAM",  alias = "Bezirk" },
+        new { name = "AnzahlInfizierter",  alias = "Anzahl Infizierter" },
+        new { name = "Neuerkrankungen", alias = "Neuerkrankungen" },
+        new { name = "Neuerkrankungen", alias = "Neuerkrankungen" },
+        new { name = "ZuwachsProc", alias = "Zuwachs in %" },
+        new { name = "Anzahl100K", alias = "Anzahl pro 100.000 Einwohner" }
+    };
+
+    
+    var records = Model.Records
+                    // Records sortieren...    
+                    // .OrderByDescending(r => Convert.ToInt32(r["Anzahl100K"])) 
+                    ;
+}
+
+@* Styles, nach belieben anpassen *@
+
+<style>
+    table {
+      border-collapse: collapse;
+      width:100%;
+      max-width:800px;
+    }
+    
+    table, th, td {
+      border: 1px solid #eee;
+    }
+    td, th{
+        padding:5px;
+        text-align: right;
+    }
+    th {
+        background-color:#ccc;
+        white-space: nowrap;
+        padding:15px 5px 5px 5px;
+    }
+    td:first-child {
+        background-color:#efefef;
+        white-space:nowrap;
+    }
+    tr:nth-child(even) {
+        background:#f8f8f8;
+    }
+</style>
+
+<table>
+    <tr>
+        @foreach(var tableColumn in tableColumns) {
+            <th>@tableColumn.alias</th>
+        }
+    </tr>
+  @foreach(var record in records) {
+
+    <tr>
+        @foreach(var tableColumn in tableColumns) {
+            <td>@record[tableColumn.name]</td>
+        }
+    </tr>
+
+  }
+
+</table>
+

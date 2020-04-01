@@ -1,0 +1,248 @@
+@* Variablen definieren *@
+@{
+    //
+    //  Datenbereich
+    //
+    
+    // Überschrift und Subtext (Copyright & Links)
+    var heading="Covid 19 Stmk: "+Model.Records.Sum(r => Convert.ToInt32(r["AnzahlInfizierter"]));
+    var subHeading = "Quelle: <a href='https://www.steiermark.at' target='blank'>Land Steiernark</a>";
+    
+    
+    // Die einzelen Datenblöcke
+    // Überschrift (Format und Parameter {0} {1} ...)
+    var itemHeader = new {
+        format = "<div>{0}:</div> <div><strong>{1}</strong></div>",
+        parameters = new string[]{ "BEZNAM",  "AnzahlInfizierter" }
+    };
+    
+    // In tableColumns kann definert werden, welche Spalten aus den Records angezeigt werden solten
+    // name = Name der Spalte in der Abfrage/Datenbank
+    // alias = Spaltenüberschrigt 
+    // Sum = über dieses Feld solte summiert werden
+
+    var tableColumns = new dynamic[] {
+    
+        new { name = "Datum",             alias = "Stand" },
+        new { name = "AnzahlInfizierter", alias = "Anzahl Infizierter",           format="<strong>{0}</strong>" },
+        new { name = "Neuerkrankungen",   alias = "Neuerkrankungen",              format="+{0}" },
+        new { name = "ZuwachsProc",       alias = "Zuwachs",                      format="{0}%" },
+        new { name = "Anzahl100K",        alias = "pro 100.000 Einwohner" },
+        new { name = "BEZNR6",               alias = "",
+                     format="<a href='' onclick=\"webgis.iFrameDialog('https://gis.server.com/webgisapi/datalinq/report/gisdb@covid@covidbezinfo?beznr={0}');return false;\">Verlauf / Statistik</a>" }
+    };
+    
+    var records = Model.Records
+                    // Records Sortieren
+                    .OrderByDescending(r => Convert.ToInt32(r["AnzahlInfizierter"])) 
+                    ;
+    
+    //                
+    // Karte
+    //
+    
+    // Kartendienste mit Beistrich getrennt
+    var mapServices = "ortsplan_tiles_default@ccgis_default";
+    var mapExtent = "stmk_m34@ccgis_default";
+    
+    // Daten, die im Popup angezeigt werden
+    var markerPopupHeading = "BEZNAM";
+    var markerPopupData = new dynamic[]
+        { 
+             new { column = "AnzahlInfizierter", format="Infizierte gessamt: {0}" },
+             new { column = "Neuerkrankungen", format="(+{0} in 24 Stunden)" }
+        };
+}
+
+<style>
+    table {
+      border-collapse: collapse;
+      width:100%;
+      max-width:800px;
+    }
+    
+    table, th, td {
+      border: 1px solid #eee;
+    }
+    td, th{
+        padding:5px;
+        text-align: right;
+    }
+    th {
+        background-color:#ccc;
+        white-space: nowrap;
+        padding:15px 5px 5px 5px;
+    }
+    td:first-child {
+        background-color:#efefef;
+        white-space:nowrap;
+    }
+    tr:nth-child(even) {
+        background:#f8f8f8;
+    }
+
+    .datalinq-app-container {
+        position: fixed;
+        left:0px;
+        top:0px;
+        right:0px;
+        bottom:0px;
+    }
+    .datalinq-map-container {
+        width:100%;
+        top:0px;
+        bottom:0px;
+        position:absolute;
+    }
+    .datalinq-data-container {
+        width:480px;
+        top:50%;
+        bottom:0px;
+        position:absolute;
+        z-index:999999;
+        background:#fff;
+    }
+    .datalinq-data-container-header {
+        position:absolute;
+        left:0px; top:0px; right:0px; height:62px;
+        padding:2px 5px;
+        font-size:10px;
+    }
+    .datalinq-data-container-header div:first-child {
+            font-size: 32px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+    }
+    .datalinq-data-container-content {
+        position:absolute;
+        left:0px; top:62px; right:0px; bottom:0px;
+        overflow-y:auto;
+        overflow-x:hidden;
+    }
+    
+    @@media (max-width: 580px) {
+        .datalinq-map-container {
+            bottom:50%;
+        }
+        .datalinq-data-container {
+            width:100%;
+            top:50%
+        }
+    }
+    
+    .datalinq-data-item {
+        width:100%;
+    }
+    .datalinq-data-item table {
+        display:none;
+    }
+    .datalinq-data-item.datalinq-geo-element-selected table {
+        display:block;
+        width:100%;
+    }
+    .datalinq-data-item table td:first-child {
+        min-width:200px;
+        text-align:right;
+    }
+    .datalinq-data-item table td:last-child {
+        width:100%;
+        text-align:left;
+    }
+    
+    .datalinq-data-item-header {
+        font-size:1.4em;
+        padding:5px;
+        border-top:1px solid #efefef;
+    }
+    .datalinq-data-item-header div {
+        display:inline-block;
+        white-space:nowrap;
+    }
+    .datalinq-data-item-header div:first-child {
+        text-align: right;
+        width: 200px;
+    }
+    .datalinq-data-item.datalinq-geo-element-selected .datalinq-data-item-header {
+        background-color: #e8e8e8;
+    }
+    
+    .leaflet-popup-content h4 {
+        margin-top: 30px;
+    }
+    
+    table {
+        margin: 0px;
+        width:100%;
+        max-width:100%;
+    }
+    
+    tr.datalinq-geo-element-selected {
+        background-color: #ff0;    
+    }
+    
+    th {
+        text-overflow: ellipsis;
+        max-width:20%;
+    }
+    
+</style>
+
+<div class='datalinq-app-container'>
+  <div class='datalinq-map-container'>
+       @DLH.Map(mapServices, mapExtent, new {
+            style="position:absolute; left:0px; right:0px; top:0px; bottom:0px;"
+        })
+  </div>    
+
+
+<div class='datalinq-data-container'>
+    <div class='datalinq-data-container-header'>
+        <div>@heading</div>
+        <div>@Raw(subHeading)</div>
+    </div>
+    <div class='datalinq-data-container-content'>
+    @foreach(var record in records) {
+        
+        @{
+            var popupContent = new System.Text.StringBuilder();
+            popupContent.Append("<div style='white-space:nowrap'>");
+            if(!String.IsNullOrEmpty(markerPopupHeading)) {
+                popupContent.Append($"<h4>{ record[markerPopupHeading] }</h4>");
+            }
+            if(markerPopupData!=null) {
+                foreach(var data in markerPopupData) {
+                    popupContent.Append("<br/>");
+                    popupContent.Append(String.Format(data.format, record[data.column]));
+                }
+            }
+            popupContent.Append("</div>");
+        }
+        
+        @DLH.BeginGeoElementFor(record, tag: "div", 
+                                        htmlAttributes: new { @class="datalinq-data-item" },
+                                        popup: popupContent.ToString(), 
+                                        link2list: "Details...")
+           <div class="datalinq-data-item-header">
+               @Raw(String.Format(itemHeader.format,  itemHeader.parameters.Select(p => record[p]).ToArray()))
+           </div>
+            <table>
+                @foreach(var tableColumn in tableColumns) {
+                    <tr>
+                        <td>@tableColumn.alias</td>
+                        
+                        @if(tableColumn.GetType().GetProperty("format") == null) {
+                            <td>@record[tableColumn.name]</td>
+                        } else {
+                            <td>@Raw(String.Format(tableColumn.format, record[tableColumn.name]))</td>
+                        }
+                    </tr>
+                }
+            </table>
+        @DLH.EndGeoElement("div")
+    }
+    </div>
+    
+</div>
+
+</div>
