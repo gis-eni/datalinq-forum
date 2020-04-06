@@ -100,7 +100,7 @@
                     var record = Model.Records.Where(r => tableColumn.Equals(r[columnField])).FirstOrDefault();
                 }
                
-                @if(record == null || String.IsNullOrEmpty(record[tableRow.name])) { @* sollte eigentlich nicht passieren!! => leere spalte *@
+                @if(record == null || String.IsNullOrEmpty(record[tableRow.name]?.ToString())) { @* sollte eigentlich nicht passieren!! => leere spalte *@
                     <td></td>
                 } else {
                     <td>@record[tableRow.name]</td>
@@ -148,7 +148,7 @@
                 } else {
                     var sum = 0;
                     foreach(var tableRow in tableRows) {
-                        if(tableRow.sum == true || !String.IsNullOrEmpty(record[tableRow.name])) {
+                        if(tableRow.sum == true || !String.IsNullOrEmpty(record[tableRow.name]?.ToString())) {
                             sum += Convert.ToInt32(record[tableRow.name]);
                             gesSumme += Convert.ToInt32(record[tableRow.name]);
                         }
