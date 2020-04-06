@@ -1,0 +1,43 @@
+@{
+    // Die Abfrage sollte genau einen Datensatz zurück geben. Diesen zuerst einmal aus Model.Records auslesen -> falls null -> Fehler ausgeben
+
+    var record = Model.Records.FirstOrDefault();
+}
+
+@if(record == null) {
+    <div class="error">
+        Leider ist ein Fehler aufgetreten. Der Datensatz ist möglicherweise nicht vorhanden
+    </div>
+} else {
+ 
+    @*
+        Mit BeginForm([Datalinq Query mit SQL Statement]) ein Formular beginnen. Die Parameter werden später an das Update Query Statement 'update-record' im Endpoint 'update-data' übergeben 
+        Das Ende des Formulars wird mit EndForm([Text für Speichern Button]) definiert
+    *@
+     
+    @DLH.BeginForm("update-data@update-record")
+
+    @* Die ObjectId als verstecktes Feld in Formular übergeben -> braucht man im UPDATE Statement beim WHERE  *@
+    @DLH.HiddenFor(record, "STOERID");  
+ 
+    @* 
+        
+        Alle weiteren Felder, die im UPDATE Statement notwendig sind, werden als Eingabefelder definiert. 
+        Dafür dient die Methode TextFor(record, [ATTRIBUT-NAME]). Eine genaue Beschriebung der Funktion gibt es in der Hilfe (zB htmlAttributes für styles, placeholder - htmlAttributes: new { placehoder="Eingabe Feld 1" })
+        Neben TextboxFor gibt es auch die Helper Funktionen ComoboFor (Auswahllisten), CheckboxFor (siehe Hilfe) und TextboxFor (Mehrzeilige Eingabefelder)
+        Theoretisch können die Felder auch in HTML Form angeführt werden. Wichtig ist, das das "name" Attribut dem Attributnamen des Feldes entespricht <input name='FIELD1' val='@record["FIELD1"]' /> 
+
+        Über HTML Tags können nach belieben Labels für die Eingabefelder gesetzt werden.
+    *@
+    <div>Engabe Feld 1</div>
+    @DLH.TextFor(record, "FIELD1");
+
+    @DLH.TextFor(record, "FIELD2");
+    
+    @DLH.TextFor(record, "FIELD3");
+    
+    @DLH.TextFor(record, "FIELD4");
+
+    @DLH.EndForm("Änderungen übernehmen")  
+
+}
