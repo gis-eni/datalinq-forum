@@ -100,7 +100,7 @@
                     var record = Model.Records.Where(r => tableColumn.Equals(r[columnField])).FirstOrDefault();
                 }
                
-                @if(record == null) { @* sollte eigentlich nicht passieren!! => leere spalte *@
+                @if(record == null || String.IsNullOrEmpty(record[tableRow.name])) { @* sollte eigentlich nicht passieren!! => leere spalte *@
                     <td></td>
                 } else {
                     <td>@record[tableRow.name]</td>
@@ -143,7 +143,7 @@
                     var record = Model.Records.Where(r => tableColumn.Equals(r[columnField])).FirstOrDefault();
                 }
                
-                @if(record == null) { @* sollte eigentlich nicht passieren!! => leere spalte *@
+                @if(record == null || String.IsNullOrEmpty(record[tableRow.Name])) { @* sollte eigentlich nicht passieren!! => leere spalte *@
                     <td></td>
                 } else {
                     var sum = 0;

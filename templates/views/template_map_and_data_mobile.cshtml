@@ -54,6 +54,36 @@
         };
 }
 
+<script type="text/javascript">
+
+// 
+//  Individuelle Makrker einbauen. falls nicht, kann Scriptblock gelöscht werder.
+//
+//  Wichtung: um auf Attribute aus dem Record im Javascript zugreifen zu können müssen die Atrtribute
+//  bei DLH.BeginGeoElementFor() als geoJsonFeatureProperties angeführt werden (siehe unten)
+//
+//  Achtung: die Schreibweise der Properites ist unterschiedliche zu den Attributen des Records:
+//     => alles Kleinbuchstaben und vorangestellter Underscore:zB aus WERT_MIT_ANZAHL wird _wert_mit_anzahl
+//
+//  Ansonsten stehen die gleichen Möglichkeiten wie in der custom.js zur Verfügung.
+//
+
+
+webgis.markerIcons["query_result"]["default"] = {
+    url: function (i, f) { 
+        //console.log(f);
+        var anzahl= Math.min(999, parseInt(f.properties['_bd.bda.covid19stat.anzahlinfizierter']));
+       
+        return webgis.css.imgResource('marker_blue_' + (anzahl) + '.png', 'markers'); 
+    },
+    size: function (i, f) { return [25, 41]; },
+    anchor: function (i, f) { return [12, 42]; },
+    popupAnchor: function (i, f) { return [0, -42]; }
+};
+
+
+</script>
+
 <style>
     table {
       border-collapse: collapse;
@@ -219,10 +249,13 @@
             popupContent.Append("</div>");
         }
         
-        @DLH.BeginGeoElementFor(record, tag: "div", 
-                                        htmlAttributes: new { @class="datalinq-data-item" },
-                                        popup: popupContent.ToString(), 
-                                        link2list: "Details...")
+        @@DLH.BeginGeoElementFor(record, tag: "div" 
+                                        ,htmlAttributes: new { @class="datalinq-data-item" }
+                                        ,popup: popupContent.ToString() 
+                                        ,link2list: "Details..."
+                                        // Dieses Attribut einbinden, wenn Attribute in Javascript Funktionen, zb oben zum ändern von Markern notwendig sind
+                                        ,geoJsonFeatureProperties: new string[]{ "bd.bda.COVID19STAT.AnzahlInfizierter" }
+                                        )
            <div class="datalinq-data-item-header">
                @Raw(String.Format(itemHeader.format,  itemHeader.parameters.Select(p => record[p]).ToArray()))
            </div>
