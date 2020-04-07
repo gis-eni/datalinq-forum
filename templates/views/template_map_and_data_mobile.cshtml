@@ -6,6 +6,10 @@
     
     // Überschrift und Subtext (Copyright & Links)
     var heading="Covid 19 Stmk: "+Model.Records.Sum(r => Convert.ToInt32(r["AnzahlInfizierter"]));
+    // Alternativ: Überschrift als Link => öffnet Dialog mit Tabelle aller Ergebnisse
+    //var heading=String.Format("<a href='' onclick=\"webgis.iFrameDialog('https://gis.server.com/datalinq/report/enetze-covid@covid-bezirke@table-bezirke','Covid-19 Steiermark');return false;\">Covid-19 Stmk: {0}</a>",
+    //                                Model.Records.Sum(r => Convert.ToInt32(r["AnzahlInfizierter"])));
+
     var subHeading = "Quelle: <a href='https://www.steiermark.at' target='blank'>Land Steiernark</a>";
     
     
@@ -72,7 +76,7 @@
 webgis.markerIcons["query_result"]["default"] = {
     url: function (i, f) { 
         //console.log(f);
-        var anzahl= Math.min(999, parseInt(f.properties['_bd.bda.covid19stat.anzahlinfizierter']));
+        var anzahl= Math.min(999, parseInt(f.properties['_anzahlinfizierter']));
        
         return webgis.css.imgResource('marker_blue_' + (anzahl) + '.png', 'markers'); 
     },
@@ -249,12 +253,12 @@ webgis.markerIcons["query_result"]["default"] = {
             popupContent.Append("</div>");
         }
         
-        @@DLH.BeginGeoElementFor(record, tag: "div" 
+        @DLH.BeginGeoElementFor(record, tag: "div" 
                                         ,htmlAttributes: new { @class="datalinq-data-item" }
                                         ,popup: popupContent.ToString() 
                                         ,link2list: "Details..."
                                         // Dieses Attribut einbinden, wenn Attribute in Javascript Funktionen, zb oben zum ändern von Markern notwendig sind
-                                        ,geoJsonFeatureProperties: new string[]{ "bd.bda.COVID19STAT.AnzahlInfizierter" }
+                                        ,geoJsonFeatureProperties: new string[]{ "AnzahlInfizierter" }
                                         )
            <div class="datalinq-data-item-header">
                @Raw(String.Format(itemHeader.format,  itemHeader.parameters.Select(p => record[p]).ToArray()))
