@@ -1,1 +1,29 @@
-/* comming soon */
+
+<table>
+    <thead>
+        <tr>
+            <th>Spalte1</th>
+            <th>Spalte2</th>
+            <th>Spalte3</th>
+            <th>Spalte4</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var record in Model.Records){
+            @DLH.BeginGeoElementFor(record, tag: "tr" 
+                                            ,htmlAttributes: new { @class="info" } 
+                                            ,popup: "<b>Gemeindegebiet: </b>" + @record["Gemeinde"] + "<br><b>GEMNR: </b>" + @record["GEMNR"]
+                                            )
+            <td>@record["GEMNR"]</td> 
+            <td>@record["Gemeinde"]</td> 
+            <td>@record["ORT"]</td>
+            <td>@record["Bezirk"]</td>
+        @DLH.EndGeoElement(tag: "tr")
+        }
+    </tbody>
+</table>
+
+
+<div>
+    @DLH.Map(mapServices, mapExtent, presentations:"", htmlAttributes: new { style="width:75%;height:750px", @class="new_class" } )
+</div>
