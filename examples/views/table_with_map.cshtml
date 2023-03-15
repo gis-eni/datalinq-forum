@@ -9,16 +9,16 @@
         </tr>
     </thead>
     <tbody>
-    @foreach(var record in Model.Records){
+        @foreach(var record in Model.Records){
             @DLH.BeginGeoElementFor(record, tag: "tr" 
                                             ,htmlAttributes: new { @class="info" } 
                                             ,popup: "<b>Gemeindegebiet: </b>" + @record["Gemeinde"] + "<br><b>GEMNR: </b>" + @record["GEMNR"]
                                             )
-            <td>@record["GEMNR"]</td> 
-            <td>@record["Gemeinde"]</td> 
-            <td>@record["ORT"]</td>
-            <td>@record["Bezirk"]</td>
-        @DLH.EndGeoElement(tag: "tr")
+                <td>@record["GEMNR"]</td> 
+                <td>@record["Gemeinde"]</td> 
+                <td>@record["ORT"]</td>
+                <td>@record["Bezirk"]</td>
+            @DLH.EndGeoElement(tag: "tr")
         }
     </tbody>
 </table>
